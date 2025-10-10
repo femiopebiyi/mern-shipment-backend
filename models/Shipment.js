@@ -1,4 +1,4 @@
-// models/Shipment.js
+
 import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
@@ -12,7 +12,7 @@ const ShipmentSchema = new Schema(
             enum: ["Pending", "In Transit", "Delivered", "Cancelled"],
             default: "Pending",
         },
-        // any other fields you want (carrier, notes, etc.)
+
         notes: { type: String, default: "" },
     },
     { timestamps: true } // createdAt, updatedAt

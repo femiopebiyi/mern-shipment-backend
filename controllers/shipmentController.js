@@ -1,4 +1,4 @@
-// controllers/shipmentController.js
+
 import Shipment from "../models/Shipment.js";
 import mongoose from "mongoose";
 

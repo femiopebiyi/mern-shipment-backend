@@ -1,4 +1,4 @@
-// routes/shipmentRoutes.js
+
 import express from "express";
 import {
     getAllShipments,

@@ -1,16 +1,17 @@
+// routes/shipmentRoutes.js
 import express from "express";
 import {
-    getShipments,
-    getShipmentById,
+    getAllShipments,
+    getShipment,
     createShipment,
     updateShipment,
-    deleteShipment,
+    deleteShipment
 } from "../controllers/shipmentController.js";
 
 const router = express.Router();
 
-router.get("/", getShipments);
-router.get("/:id", getShipmentById);
+router.get("/", getAllShipments);
+router.get("/:id", getShipment);
 router.post("/", createShipment);
 router.put("/:id", updateShipment);
 router.delete("/:id", deleteShipment);

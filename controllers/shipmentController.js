@@ -1,59 +1,67 @@
+// controllers/shipmentController.js
 import Shipment from "../models/Shipment.js";
+import mongoose from "mongoose";
 
-// GET all shipments
-export const getShipments = async (req, res) => {
+function validateObjectId(id) {
+    return mongoose.Types.ObjectId.isValid(id);
+}
+
+export const getAllShipments = async (req, res, next) => {
     try {
-        const shipments = await Shipment.find();
-        res.status(200).json(shipments);
+        const shipments = await Shipment.find().sort({ createdAt: -1 });
+        res.json({ success: true, data: shipments });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err);
     }
 };
 
-// GET one shipment
-export const getShipmentById = async (req, res) => {
+export const getShipment = async (req, res, next) => {
     try {
-        const shipment = await Shipment.findById(req.params.id);
-        if (!shipment) return res.status(404).json({ message: "Shipment not found" });
-        res.status(200).json(shipment);
+        const { id } = req.params;
+        if (!validateObjectId(id)) return res.status(400).json({ success: false, message: "Invalid shipment id" });
+        const shipment = await Shipment.findById(id);
+        if (!shipment) return res.status(404).json({ success: false, message: "Shipment not found" });
+        res.json({ success: true, data: shipment });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err);
     }
 };
 
-// POST create shipment
-export const createShipment = async (req, res) => {
-    const { origin, destination, status } = req.body;
-    if (!origin || !destination)
-        return res.status(400).json({ message: "Origin and destination are required" });
-
+export const createShipment = async (req, res, next) => {
     try {
-        const shipment = new Shipment({ origin, destination, status });
-        const saved = await shipment.save();
-        res.status(201).json(saved);
+        const { origin, destination, status, notes } = req.body;
+        if (!origin || !destination) return res.status(400).json({ success: false, message: "origin and destination are required" });
+
+        const newShipment = await Shipment.create({ origin, destination, status, notes });
+        res.status(201).json({ success: true, data: newShipment, message: "Shipment created" });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err);
     }
 };
 
-// PUT update shipment
-export const updateShipment = async (req, res) => {
+export const updateShipment = async (req, res, next) => {
     try {
-        const updated = await Shipment.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updated) return res.status(404).json({ message: "Shipment not found" });
-        res.status(200).json(updated);
+        const { id } = req.params;
+        if (!validateObjectId(id)) return res.status(400).json({ success: false, message: "Invalid shipment id" });
+
+        const updates = req.body;
+        const updated = await Shipment.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
+        if (!updated) return res.status(404).json({ success: false, message: "Shipment not found" });
+        res.json({ success: true, data: updated, message: "Shipment updated" });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err);
     }
 };
 
-// DELETE shipment
-export const deleteShipment = async (req, res) => {
+export const deleteShipment = async (req, res, next) => {
     try {
-        const deleted = await Shipment.findByIdAndDelete(req.params.id);
-        if (!deleted) return res.status(404).json({ message: "Shipment not found" });
-        res.status(200).json({ message: "Shipment deleted successfully" });
+        const { id } = req.params;
+        if (!validateObjectId(id)) return res.status(400).json({ success: false, message: "Invalid shipment id" });
+
+        const deleted = await Shipment.findByIdAndDelete(id);
+        if (!deleted) return res.status(404).json({ success: false, message: "Shipment not found" });
+        res.json({ success: true, data: deleted, message: "Shipment deleted" });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err);
     }
 };
